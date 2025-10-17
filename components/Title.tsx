@@ -12,7 +12,7 @@ interface TitleProps {
 
 export default function Title({
   title = "Valkr",
-  subtitle = "merit based search engine",
+  subtitle = "a merit based search engine",
   size = "main",
   colorOverride,
 }: TitleProps) {

@@ -17,11 +17,16 @@ export default function SearchBar() {
       <form onSubmit={handleSubmit} className="w-full">
         <div
           className={`
-            flex items-stretch w-full
-            bg-black/65 
-            border border-gray-400/30 
-            rounded-lg overflow-hidden
-            transition-opacity duration-300 ease-in-out
+            flex
+            items-stretch
+            w-full
+            bg-black/45
+            border
+            border-gray-400/30 
+            rounded-lg
+            overflow-hidden
+            transition-opacity
+            duration-300 ease-in-out
             ${isActive ? "opacity-100" : "opacity-75 hover:opacity-100 focus-within:opacity-100"}
           `}
         >
