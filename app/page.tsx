@@ -1,5 +1,6 @@
 import SearchBar from "@/components/SearchBar";
 import Title from "@/components/Title";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -7,6 +8,21 @@ export default function Home() {
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <Title size="main" />
         <SearchBar />
+
+        <div className="w-full">
+          <Link
+            href={"/add-sitemap"}
+            className={`
+              text-sm
+              text-gray-400
+              hover:text-gray-300
+              transition-colors
+              duration-200
+            `}
+          >
+            Submit a Sitemap
+          </Link>
+        </div>
       </main>
     </div>
   );
