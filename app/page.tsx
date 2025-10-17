@@ -14,11 +14,14 @@ export default function Home() {
             href={"/add-sitemap"}
             className={`
               text-sm
-              text-gray-400
-              hover:text-gray-300
               transition-colors
               duration-200
+              hover:opacity-80
             `}
+            style={{
+              color: 'var(--foreground)',
+              opacity: 0.6
+            }}
           >
             Submit a Sitemap
           </Link>

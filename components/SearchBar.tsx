@@ -20,15 +20,17 @@ export default function SearchBar() {
             flex
             items-stretch
             w-full
-            bg-black/45
             border
-            border-gray-400/30 
             rounded-lg
             overflow-hidden
-            transition-opacity
+            transition-all
             duration-300 ease-in-out
             ${isActive ? "opacity-100" : "opacity-75 hover:opacity-100 focus-within:opacity-100"}
           `}
+          style={{
+            backgroundColor: 'rgba(var(--background-secondary-rgb, 26, 26, 26), 0.8)',
+            borderColor: 'var(--border-secondary)'
+          }}
         >
           <input
             type="text"
@@ -38,30 +40,40 @@ export default function SearchBar() {
             className="
               flex-1 
               bg-transparent 
-              text-gray-300
-              placeholder:text-gray-500
               px-5 py-3
               outline-none 
               focus:outline-none
               border-0
               transition-colors
               duration-200
+              placeholder:opacity-60
             "
+            style={{
+              color: 'var(--foreground)',
+            }}
           />
           <button
             type="submit"
             className="
-              bg-transparent/20
-              text-gray-500
-              hover:text-gray-300
               font-medium
               px-8
               transition-colors
               duration-200
               ease-in-out
               border-l
-              border-gray-400/30
             "
+            style={{
+              backgroundColor: 'rgba(var(--background-secondary-rgb, 26, 26, 26), 0.3)',
+              color: 'var(--foreground)',
+              borderColor: 'var(--border-secondary)',
+              opacity: 0.7
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.opacity = '1'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = '0.7'
+            }}
           >
             Go
           </button>

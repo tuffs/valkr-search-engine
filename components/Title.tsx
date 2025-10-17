@@ -67,8 +67,10 @@ export default function Title({
         className={cn(
           titleClasses[size],
           "font-black tracking-tighter leading-none m-0 p-0",
-          colorOverride || "text-white",
         )}
+        style={{
+          color: colorOverride || 'var(--foreground)'
+        }}
       >
         {title}
       </h1>
@@ -77,8 +79,11 @@ export default function Title({
           className={cn(
             subtitleClasses[size],
             "font-extralight tracking-normal leading-tight m-0 p-0 mt-0",
-            subtitleColor || "text-gray-300",
           )}
+          style={{
+            color: subtitleColor || 'var(--foreground)',
+            opacity: 0.7
+          }}
         >
           {subtitle}
         </h3>
