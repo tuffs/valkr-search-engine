@@ -9,12 +9,12 @@ export async function queryLLM(query: string) {
       return { success: false, error: "Empty query provided" };
     }
 
-    if (!process.env.OPENROUTER_API_KEY) {
-      console.error("❌ Missing OPENROUTER_API_KEY environment variable");
+    if (!process.env.XAI_API_KEY) {
+      console.error("❌ Missing XAI_API_KEY environment variable");
       return { success: false, error: "API key not configured" };
     }
 
-    // Optimized prompt for Gemini 2.5 Fast with focus on real, active URLs
+    // Optimized prompt for Grok-3-mini with focus on real, active URLs
     const prompt = `You are a web search result generator. Generate EXACTLY ${
       process.env.MAX_RESPONSE_BOUND || 15
     } real, active, high-quality webpage results for the given search query.
@@ -39,47 +39,40 @@ Generate exactly ${
       process.env.MAX_RESPONSE_BOUND || 15
     } results. Be fast and accurate.`;
 
-    console.log(`📝 Sending request to OpenRouter API...`);
+    console.log(`📝 Sending request to xAI API...`);
 
-    const result = await fetch(
-      "https://openrouter.ai/api/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          "HTTP-Referer": process.env.SITE_URL || "http://localhost:3000",
-          "X-Title": "Valkr Search Engine",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-2.0-flash-exp:free",
-          messages: [
-            {
-              role: "user",
-              content: prompt,
-            },
-          ],
-          temperature: 0.3,
-          max_tokens: 2000,
-          top_p: 0.9,
-        }),
-      }
-    );
+    const result = await fetch("https://api.x.ai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.XAI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "grok-3-mini",
+        messages: [
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        temperature: 0.3,
+        max_tokens: 2000,
+        top_p: 0.9,
+      }),
+    });
 
-    console.log(`📡 OpenRouter API response status: ${result.status}`);
+    console.log(`📡 xAI API response status: ${result.status}`);
 
     if (!result.ok) {
       const errorText = await result.text();
       console.error(
-        `❌ OpenRouter API error: ${result.status} ${result.statusText} - ${errorText}`
+        `❌ xAI API error: ${result.status} ${result.statusText} - ${errorText}`
       );
-      throw new Error(
-        `OpenRouter API error: ${result.status} ${result.statusText}`
-      );
+      throw new Error(`xAI API error: ${result.status} ${result.statusText}`);
     }
 
     const responseData = await result.json();
-    console.log(`📊 OpenRouter API response structure:`, {
+    console.log(`📊 xAI API response structure:`, {
       hasChoices: !!responseData.choices,
       choicesLength: responseData.choices?.length || 0,
       hasContent: !!responseData.choices?.[0]?.message?.content,
@@ -88,17 +81,17 @@ Generate exactly ${
     });
 
     if (responseData.error) {
-      console.error(`❌ OpenRouter API returned error:`, responseData.error);
-      throw new Error(`OpenRouter API error: ${responseData.error.message}`);
+      console.error(`❌ xAI API returned error:`, responseData.error);
+      throw new Error(`xAI API error: ${responseData.error.message}`);
     }
 
     if (!responseData.choices || responseData.choices.length === 0) {
-      console.error(`❌ OpenRouter API returned no choices`);
+      console.error(`❌ xAI API returned no choices`);
       throw new Error("No response choices received from API");
     }
 
     if (!responseData.choices[0]?.message?.content) {
-      console.error(`❌ OpenRouter API returned empty content`);
+      console.error(`❌ xAI API returned empty content`);
       throw new Error("Empty content received from API");
     }
 
