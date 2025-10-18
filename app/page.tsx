@@ -9,7 +9,7 @@ export default function Home() {
         <Title size="main" />
         <SearchBar autoFocus />
 
-        <div className="mx-auto">
+        <div className="mx-auto hidden">
           <Link
             href={"/add-sitemap"}
             className={`

@@ -3,6 +3,25 @@
 import { prisma } from "@/prisma/db";
 import { revalidatePath } from "next/cache";
 
+export async function getNextWebpageId(): Promise<number> {
+  try {
+    const lastWebpage = await prisma.webpage.findFirst({
+      orderBy: {
+        id: "desc",
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    return (lastWebpage?.id || 0) + 1;
+  } catch (error) {
+    console.error("Error getting next webpage ID:", error);
+    // Fallback to current timestamp to ensure uniqueness
+    return Date.now();
+  }
+}
+
 export async function searchWebpages(query: string) {
   try {
     const webpages = await prisma.webpage.findMany({

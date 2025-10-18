@@ -2,6 +2,7 @@
 
 import type { Webpage } from '@/types/webpage';
 import SearchResult from '@/components/SearchResult';
+import { generateWebpageKey, generateLoadingKey } from '@/lib/searchUtils';
 
 interface SearchResultsProps {
   webpages?: Webpage[]
@@ -51,7 +52,7 @@ export default function SearchResults({ webpages, isLoading = false, error = nul
         style={{ borderColor: 'var(--border-secondary)' }}
       >
         {[...Array(5)].map((_, i) => (
-          <SearchResult key={i} isLoading={true} />
+          <SearchResult key={generateLoadingKey(i)} isLoading={true} />
         ))}
       </ul>
     )
@@ -97,7 +98,7 @@ export default function SearchResults({ webpages, isLoading = false, error = nul
       style={{ borderColor: 'var(--border-secondary)' }}
     >
       {webpages.map((webpage) => (
-        <SearchResult key={webpage.id} webpage={webpage} />
+        <SearchResult key={generateWebpageKey(webpage)} webpage={webpage} />
       ))}
     </ul>
   )

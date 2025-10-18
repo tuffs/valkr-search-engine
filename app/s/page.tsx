@@ -1,8 +1,6 @@
 import SearchBar from "@/components/SearchBar"
 import Title from "@/components/Title"
-import SearchResults from "@/components/SearchResults"
-import { searchWebpages } from "@/actions/webpageActions"
-import type { Webpage } from "@/types/webpage"
+import EnhancedSearch from "@/components/EnhancedSearch"
 
 interface SearchPageProps {
   searchParams: Promise<{ q?: string }>
@@ -11,19 +9,6 @@ interface SearchPageProps {
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams
   const query = params.q || ""
-
-  let webpages: Webpage[] = []
-  let error: string | null = null
-
-  if (query) {
-    const result = await searchWebpages(query)
-
-    if (result.success && result.data) {
-      webpages = result.data
-    } else {
-      error = result.error || "Failed to fetch search results"
-    }
-  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -42,19 +27,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
         {query ? (
-          <>
-            <div className="mb-4 sm:mb-6 space-y-1">
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                Search results for: <span className="font-medium text-foreground break-words">{query}</span>
-              </p>
-              {webpages.length > 0 && (
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  Found {webpages.length} result{webpages.length !== 1 ? "s" : ""}
-                </p>
-              )}
-            </div>
-            <SearchResults webpages={webpages} error={error} />
-          </>
+          <EnhancedSearch query={query} />
         ) : (
           <div className="flex flex-col items-center justify-center py-12 sm:py-16 md:py-20 lg:py-24 px-4">
             <div className="text-center space-y-3 sm:space-y-4 max-w-lg">

@@ -12,3 +12,45 @@ This will allow us to begin our project, gather data, and make the search engine
 implementation for the quickest MVP will be given precedence at first.
 
 We need a solid set of statistics which will become important to this project and how the data that this project includes is ranked. This entire process will be done with the goal of providing 100% transparency to our userbase. The desire for this project to grow is very important and at first, the manual submission of links and websites will take presedence in matching results for queries requesting the same data.
+
+# QUERY / RESPONSE CONTROL FLOW
+
+---
+
+1.  INTAKE USER QUERY
+    We want to take our search term, question, or prompt for response as our query string; at first.
+
+2.  REQUEST DATA FROM DATABASE AND AI LLM SIMULTANEOUSLY
+
+    A. FIRE UP A SESSION WITH OUR AI LLM
+    We want to simultaneously ask the LLM for URLs based on the user's provided query string.
+    We will take the MAX_RESPONSE_BOUND of URLs based on the query string. We will provide a
+    particular prompt plus the search string query from the user to the AI model so that when
+    we get a response of URLs, they match what we need in order to insert data into the database
+    as our results.
+
+    _We wait to enter any information into the relational database for now._
+
+    B. LOOK FOR ANY MATCHING RESULTS IN OUR EXISTING DATABASE
+    We will query our database for the matching URLs that we already have in our system based
+    on the users search query string. The number of responses that we get in addition to
+    the MAX_RESPONSE_BOUND will double as an UPPER LIMIT. Meaning, if our limit is 30 we
+    CAN have up to 60 URLs that will be shown to the user.
+
+3.  COMBINE DATABASE AND AI RESPONSES
+    Once we have results from both the database and AI, we will filter these responses
+    into the proper, best order by sending all responses COMBINED into our AI LLM again
+    and request that it provide an order of relevancy based on the original users observed
+    intent from the original search string query.
+
+4.  FILTER OUT ANY REPEATED WEBPAGES W/ IDENTICAL URLS
+    We will need to filter out all results which are identical, we will try and ensure that
+    this does _NOT_ happen with the AI data provided but we _MUST_ assure that this is not
+    the case.
+
+5.  DISPLAY RESULTS TO THE USER
+    Now that we have our results formatted into an array of Webpages based on our type, we
+    send the results to the user's client browser in the reordered list from AI's second
+    response.
+
+6.  SAVE ADDITIONAL URLs TO OUR DATABASE
