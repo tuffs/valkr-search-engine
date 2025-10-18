@@ -33,7 +33,7 @@ Generate exactly ${
         method: "POST",
         headers: {
           Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          "HTTP-Referer": process.env.SITE_URL || "http://localhost:3000",
+          "HTTP-Referer": "https://valkr.io",
           "X-Title": "Valkr Search Engine",
           "Content-Type": "application/json",
         },
