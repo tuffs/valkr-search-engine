@@ -3,7 +3,11 @@
 import { useState, type FormEvent } from "react"
 import { useRouter } from "next/navigation"
 
-export default function SearchBar() {
+interface SearchBarProps {
+  autoFocus?: boolean
+}
+
+export default function SearchBar({ autoFocus = false }: SearchBarProps) {
   const [query, setQuery] = useState("")
   const router = useRouter()
 
@@ -43,6 +47,7 @@ export default function SearchBar() {
             placeholder="Enter your search query..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            autoFocus={autoFocus}
             className="
               flex-1 
               bg-transparent 
