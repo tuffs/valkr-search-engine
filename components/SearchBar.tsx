@@ -29,7 +29,7 @@ export default function SearchBar() {
           `}
           style={{
             backgroundColor: 'rgba(var(--background-secondary-rgb, 26, 26, 26), 0.8)',
-            borderColor: 'var(--border-secondary)'
+            borderColor: 'var(--searchbar-border)'
           }}
         >
           <input
@@ -65,7 +65,7 @@ export default function SearchBar() {
             style={{
               backgroundColor: 'rgba(var(--background-secondary-rgb, 26, 26, 26), 0.3)',
               color: 'var(--foreground)',
-              borderColor: 'var(--border-secondary)',
+              borderColor: 'var(--searchbar-border)',
               opacity: 0.7
             }}
             onMouseEnter={(e) => {

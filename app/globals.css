@@ -7,6 +7,7 @@
   --background-secondary-rgb: 26, 26, 26;
   --border: #404040;
   --border-secondary: rgba(255, 255, 255, 0.1);
+  --searchbar-border: rgba(255, 255, 255, 0.1);
 }
 
 :root.light {
@@ -16,6 +17,7 @@
   --background-secondary-rgb: 245, 245, 245;
   --border: #d4d4d4;
   --border-secondary: rgba(0, 0, 0, 0.1);
+  --searchbar-border: rgba(0, 0, 0, 0.2);
 }
 
 @theme inline {
@@ -39,4 +41,13 @@ body {
 ::placeholder {
   color: var(--foreground);
   opacity: 0.5;
+}
+
+/* Custom divide colors with 35% opacity */
+.divide-y > :not([hidden]) ~ :not([hidden]) {
+  border-top-color: rgba(255, 255, 255, 0.35);
+}
+
+:root.light .divide-y > :not([hidden]) ~ :not([hidden]) {
+  border-top-color: rgba(33, 17, 0, 0.35);
 }
