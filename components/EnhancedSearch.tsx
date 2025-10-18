@@ -77,8 +77,8 @@ export default function EnhancedSearch({ query }: EnhancedSearchProps) {
           console.warn('⚠️ Database search returned empty or invalid result')
         }
 
-        // Process LLM results
-        if (llmResult.status === 'fulfilled' && llmResult.value?.success && llmResult.value.result?.choices?.[0]?.message?.content) {
+        // Process LLM results - be more lenient and preserve any valid results
+        if (llmResult.status === 'fulfilled' && llmResult.value?.result?.choices?.[0]?.message?.content) {
           const llmContent = llmResult.value.result.choices[0].message.content
           console.log(`📝 LLM response content length: ${llmContent.length} characters`)
 
@@ -92,13 +92,17 @@ export default function EnhancedSearch({ query }: EnhancedSearchProps) {
             .filter((webpage: Webpage) => validateWebpage(webpage))
 
           console.log(`✅ LLM processing complete: ${parsedLLMResults.length} raw → ${llmWebpages.length} valid results`)
-        } else if (llmResult.status === 'fulfilled' && !llmResult.value?.success) {
-          console.error('❌ LLM search failed (fulfilled but not successful):', llmResult.value)
-        } else if (llmResult.status === 'rejected') {
-          console.error('❌ LLM search rejected:', llmResult.reason)
-        } else if (llmResult.status === 'fulfilled') {
-          console.warn('⚠️ LLM search succeeded but no valid content:', llmResult.value)
-        }        // Deduplicate and combine results (database first, then LLM)
+        } else {
+          // Just log LLM issues but don't fail the entire search
+          console.warn('⚠️ LLM search did not return usable results, continuing with database results only')
+          if (llmResult.status === 'rejected') {
+            console.warn('LLM rejection reason:', llmResult.reason)
+          } else if (llmResult.status === 'fulfilled') {
+            console.warn('LLM response structure:', llmResult.value)
+          }
+        }
+
+        // Deduplicate and combine results (database first, then LLM)
         const combinedWebpages = deduplicateWebpages(dbWebpages, llmWebpages)
 
         console.log(`📊 Search Results Summary:
