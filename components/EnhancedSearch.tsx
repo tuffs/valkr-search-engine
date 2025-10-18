@@ -43,6 +43,8 @@ export default function EnhancedSearch({ query }: EnhancedSearchProps) {
     const performSearch = async () => {
       setSearchState(prev => ({ ...prev, isLoading: true, error: null }))
 
+      console.log(`🚀 Starting search for query: "${query}"`)
+
       try {
         // Execute database search and LLM query in parallel for maximum performance
         const [dbResult, llmResult] = await Promise.allSettled([
@@ -50,22 +52,38 @@ export default function EnhancedSearch({ query }: EnhancedSearchProps) {
           queryLLM(query)
         ])
 
+        console.log('📊 Raw results received:', {
+          dbStatus: dbResult.status,
+          llmStatus: llmResult.status,
+          dbValue: dbResult.status === 'fulfilled' ? dbResult.value : null,
+          llmValue: llmResult.status === 'fulfilled' ? llmResult.value : null
+        })
+
         let dbWebpages: Webpage[] = []
         let llmWebpages: Webpage[] = []
         let searchError: string | null = null
 
         // Process database results
-        if (dbResult.status === 'fulfilled' && dbResult.value.success && dbResult.value.data) {
+        if (dbResult.status === 'fulfilled' && dbResult.value?.success && dbResult.value.data) {
           dbWebpages = dbResult.value.data
+          console.log(`✅ Database search successful: ${dbWebpages.length} results`)
+        } else if (dbResult.status === 'fulfilled' && !dbResult.value?.success) {
+          console.error('❌ Database search failed (fulfilled but not successful):', dbResult.value)
+          searchError = dbResult.value?.error || "Database search failed"
         } else if (dbResult.status === 'rejected') {
-          console.error('Database search failed:', dbResult.reason)
+          console.error('❌ Database search rejected:', dbResult.reason)
           searchError = "Database search encountered an error"
+        } else {
+          console.warn('⚠️ Database search returned empty or invalid result')
         }
 
         // Process LLM results
         if (llmResult.status === 'fulfilled' && llmResult.value?.success && llmResult.value.result?.choices?.[0]?.message?.content) {
           const llmContent = llmResult.value.result.choices[0].message.content
+          console.log(`📝 LLM response content length: ${llmContent.length} characters`)
+
           const parsedLLMResults = parseLLMResponse(llmContent)
+          console.log(`🔍 Parsed ${parsedLLMResults.length} raw entries from LLM`)
 
           // Assign proper temporary IDs and validate data
           llmWebpages = parsedLLMResults
@@ -73,10 +91,13 @@ export default function EnhancedSearch({ query }: EnhancedSearchProps) {
             .map((webpage: Webpage) => sanitizeWebpage(webpage))
             .filter((webpage: Webpage) => validateWebpage(webpage))
 
-          console.log(`🔍 Parsed ${parsedLLMResults.length} URLs from LLM response, ${llmWebpages.length} valid after validation`)
+          console.log(`✅ LLM processing complete: ${parsedLLMResults.length} raw → ${llmWebpages.length} valid results`)
+        } else if (llmResult.status === 'fulfilled' && !llmResult.value?.success) {
+          console.error('❌ LLM search failed (fulfilled but not successful):', llmResult.value)
         } else if (llmResult.status === 'rejected') {
-          console.error('LLM search failed:', llmResult.reason)
-          // Don't set error for LLM failure, just continue with database results
+          console.error('❌ LLM search rejected:', llmResult.reason)
+        } else if (llmResult.status === 'fulfilled') {
+          console.warn('⚠️ LLM search succeeded but no valid content:', llmResult.value)
         }        // Deduplicate and combine results (database first, then LLM)
         const combinedWebpages = deduplicateWebpages(dbWebpages, llmWebpages)
 
@@ -85,11 +106,33 @@ export default function EnhancedSearch({ query }: EnhancedSearchProps) {
           - LLM results: ${llmWebpages.length}
           - Combined (after deduplication): ${combinedWebpages.length}`)
 
+        // If we have absolutely no results, try a fallback search
+        if (combinedWebpages.length === 0) {
+          console.log(`⚠️ No results found, attempting fallback search...`)
+          try {
+            const fallbackResult = await searchWebpages('')
+            if (fallbackResult.success && fallbackResult.data && fallbackResult.data.length > 0) {
+              const fallbackPages = fallbackResult.data.slice(0, 10) // Take first 10 as fallback
+              console.log(`🔄 Fallback search found ${fallbackPages.length} results`)
+              setSearchState({
+                isLoading: false,
+                webpages: fallbackPages,
+                error: null,
+                dbResultsCount: fallbackPages.length,
+                llmResultsCount: 0
+              })
+              return
+            }
+          } catch (fallbackError) {
+            console.error('❌ Fallback search also failed:', fallbackError)
+          }
+        }
+
         // Update state with results
         setSearchState({
           isLoading: false,
           webpages: combinedWebpages,
-          error: searchError,
+          error: combinedWebpages.length === 0 ? "No results found for your search query" : searchError,
           dbResultsCount: dbWebpages.length,
           llmResultsCount: llmWebpages.length
         })

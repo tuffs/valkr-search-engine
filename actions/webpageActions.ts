@@ -24,6 +24,13 @@ export async function getNextWebpageId(): Promise<number> {
 
 export async function searchWebpages(query: string) {
   try {
+    console.log(`🔍 Database search starting for: "${query}"`);
+
+    if (!query || query.trim() === "") {
+      console.log("⚠️ Empty query provided to database search");
+      return { success: true, data: [] };
+    }
+
     const webpages = await prisma.webpage.findMany({
       where: {
         OR: [
@@ -53,10 +60,17 @@ export async function searchWebpages(query: string) {
       take: 50,
     });
 
+    console.log(
+      `✅ Database search completed: ${webpages.length} results found`
+    );
     return { success: true, data: webpages };
   } catch (error) {
-    console.error("Error searching webpages:", error);
-    return { success: false, error: "Failed to search webpages" };
+    console.error("❌ Database search error:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to search webpages",
+    };
   }
 }
 
