@@ -54,3 +54,4 @@ We need a solid set of statistics which will become important to this project an
     response.
 
 6.  SAVE ADDITIONAL URLs TO OUR DATABASE
+    The results must be saved.
