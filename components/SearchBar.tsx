@@ -1,13 +1,19 @@
 "use client"
 
 import { useState, type FormEvent } from "react"
+import { useRouter } from "next/navigation"
 
 export default function SearchBar() {
   const [query, setQuery] = useState("")
+  const router = useRouter()
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log("Search query:", query)
+
+    if (query.trim()) {
+      // Navigate to search results page with query parameter
+      router.push(`/s?q=${encodeURIComponent(query.trim())}`)
+    }
   }
 
   const isActive = query.length > 0
@@ -54,6 +60,7 @@ export default function SearchBar() {
           />
           <button
             type="submit"
+            disabled={!isActive}
             className="
               font-medium
               px-8
@@ -69,10 +76,10 @@ export default function SearchBar() {
               opacity: 0.7
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.opacity = '1'
+              if (isActive) e.currentTarget.style.opacity = "1"
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.opacity = '0.7'
+              if (isActive) e.currentTarget.style.opacity = "0.7"
             }}
           >
             Go
